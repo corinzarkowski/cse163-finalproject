@@ -49,7 +49,6 @@ def fetch_nba_player_URLs():
       if(match):
         players[match[0][1]] = match[0][0]
   
-  print('successfully retrieved nba player urls')
   return players
 
 
@@ -67,7 +66,6 @@ def fetch_cbb_player_URLs():
       if match:
         players_cbb[match[0][1]] = match[0][0]
 
-  print('successfully retrieved cbb player urls')
   return players_cbb
 
 
@@ -76,7 +74,9 @@ def fetch_nba_career_data(players):
   player_data_by_year = {}
 
   for year in range(1950, 2022):
-    print('current year: ' + str(year))
+    if (year - 1950) % 5 == 0:
+      print(str(int((year - 1950) / 72 * 100)) + '%')
+
     URL = 'https://www.basketball-reference.com/leagues/NBA_' + str(year) + '_totals.html'
     data = requests.get(URL, stream=True)
     for line in data.iter_lines():
@@ -109,7 +109,6 @@ def fetch_nba_career_data(players):
         if matchBlocks:
           player_data_by_year[match[0]][year]['blocks'] = matchBlocks[0]
   
-  print('successfully retrieved nba career data')
   return player_data_by_year
 
 
@@ -143,7 +142,6 @@ def format_career_data(player_data_by_year):
       player_data_noyear[player_name]['best_year'] = best_year
       player_data_noyear[player_name]['career_length'] = cur_year - 1
 
-  print('successfully formatted career data')
   return player_data_noyear
 
 
@@ -258,7 +256,6 @@ def fetch_college_data(players_cbb, player_data_noyear):
 
     player_data_noyear[player] = fetch_college_player_data(players_cbb[player])
 
-  print('successfully retrieved all college data')
   return player_data_noyear
 
 
