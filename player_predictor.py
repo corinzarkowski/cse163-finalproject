@@ -1,4 +1,3 @@
-import sys
 import os
 import requests
 import re
@@ -11,6 +10,7 @@ from difflib import SequenceMatcher
 
 URL_CSV = 'https://gist.githubusercontent.com/corinzarkowski/4d1e66a9253b552ee95d62dbf74b3185/raw/579c5421fae54680435ca33e104c254c74638af1/cbb_nba_data.csv'
 URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c4095e55173d52873b/raw/8541672e08f7f1f00dd8ef4440b7742f87357c33/cbb_names_urls.json'
+
 
 def process_args():
   # TODO: add checks to make sure args are valid
@@ -257,7 +257,6 @@ def fetch_college_data(players_cbb, player_data_noyear):
   return player_data_noyear
 
 
-
 def init_data_manual():
   print('initializing data...')
   if not os.path.exists(os.path.join(os.getcwd(), 'data')):
@@ -329,7 +328,6 @@ def main():
     if player not in cbb_players.keys():
       potential_player = find_similar_player(player, list(cbb_players.keys()))
       print(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '?')
-  
 
 
 if __name__ == '__main__':
