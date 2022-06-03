@@ -17,7 +17,7 @@ def process_args():
 
   parser = argparse.ArgumentParser(description='Take college basketball players and return career predictions')
   parser.add_argument('players', metavar='P', type=str, nargs='+',
-                      help='player(s) to predict')
+                      help='Player(s) to predict. input in \'player1\' \'player2\' \'player3\' format')
   parser.add_argument('--reload-manual', dest='do_refresh_man', action='store_const',
                       const=True, default=False,
                       help='Option to refresh player data from https://www.sports-reference.com/cbb/, https://www.basketball-reference.com/. (slower, but updates data from source)')
