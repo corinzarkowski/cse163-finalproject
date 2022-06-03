@@ -13,8 +13,6 @@ URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c409
 
 
 def process_args():
-  # TODO: add checks to make sure args are valid
-
   parser = argparse.ArgumentParser(description='Take college basketball players and return career predictions')
   parser.add_argument('players', metavar='P', type=str, nargs='+',
                       help='Player(s) to predict. input in \'player1\' \'player2\' \'player3\' format')
@@ -149,9 +147,104 @@ def format_career_data(player_data_by_year):
   return player_data_noyear
 
 
+def fetch_college_player_data(player_url):
+  URL = 'https://www.sports-reference.com/cbb/players' + player_url
+  data = requests.get(URL, stream=True)
+  cur_player = {}
+  
+  gamesLine = False
+  pointsLine = False
+  reboundsLine = False
+  assistsLine = False
+  FGPLine = False
+  TFGPLine = False
+  FTPLine = False
+  EFGPLine = False
+  WSLine = False
+  
+  for line in data.iter_lines():
+    if gamesLine:
+      match = re.findall('<p>([\d]*)</p></div>', str(line))
+      if match:  
+        cur_player['Games'] = match[0]
+      gamesLine = False
+    if pointsLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['Points'] = match[0]
+      pointsLine = False
+    if reboundsLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['Rebounds'] = match[0]
+      reboundsLine = False
+    if assistsLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['Assists'] = match[0]
+      assistsLine = False
+    if FGPLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['FGP'] = match[0]
+      FGPLine = False
+    if TFGPLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['TFGP'] = match[0]
+      TFGPLine = False
+    if FTPLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['FTP'] = match[0]
+      FTPLine = False
+    if EFGPLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['EFGP'] = match[0]
+      EFGPLine = False
+    if WSLine:
+      match = re.findall('<p>([\d.]*)</p></div>', str(line))
+      if match:  
+        cur_player['WS'] = match[0]
+      WSLine = False
+    
+    
+    matchGames = re.findall('data-tip="Games"><strong>G</strong>', str(line))
+    matchPoints = re.findall('data-tip="Points"><strong>PTS</strong>', str(line))
+    matchRebounds = re.findall('data-tip="Total Rebounds"><strong>TRB</strong>', str(line))
+    matchAssists = re.findall('data-tip="Assists"><strong>AST</strong>', str(line))
+    matchFGP = re.findall('data-tip="Field Goal Percentage"><strong>FG%</strong>', str(line))
+    matchTFGP = re.findall('data-tip="3-Point Field Goal Percentage"><strong>FG3%</strong>', str(line))
+    matchFTP = re.findall('data-tip="Free Throw Percentage"><strong>FT%</strong>', str(line))
+    matchEFGP = re.findall('data-tip="Effective Field Goal Percentage; this statistic adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal."><strong>eFG%</strong>', str(line))
+    matchWS = re.findall('data-tip="Win Shares; an estimate of the number of wins contributed by a player due to his offense and defense."><strong>WS</strong>', str(line))
+    
+    if matchGames:
+        gamesLine = True
+    if matchPoints:
+        pointsLine = True
+    if matchRebounds:
+        reboundsLine = True
+    if matchAssists:
+        assistsLine = True
+    if matchFGP:
+        FGPLine = True
+    if matchTFGP:
+        TFGPLine = True
+    if matchFTP:
+        FTPLine = True
+    if matchEFGP:
+        EFGPLine = True
+    if matchWS:
+        WSLine = True
+
+  return cur_player
+
+
 def fetch_college_data(players_cbb, player_data_noyear):
   print('fetching college data for nba players...')
-  print('this may take awhile')
+  print('this may take a while')
 
   count = 0
 
@@ -162,96 +255,8 @@ def fetch_college_data(players_cbb, player_data_noyear):
         
     if player not in players_cbb.keys():
       continue
-    
-    URL = 'https://www.sports-reference.com/cbb/players' + players_cbb[player]
-    data = requests.get(URL, stream=True)
-    
-    gamesLine = False
-    pointsLine = False
-    reboundsLine = False
-    assistsLine = False
-    FGPLine = False
-    TFGPLine = False
-    FTPLine = False
-    EFGPLine = False
-    WSLine = False
-    
-    for line in data.iter_lines():
-      if gamesLine:
-        match = re.findall('<p>([\d]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['Games'] = match[0]
-        gamesLine = False
-      if pointsLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['Points'] = match[0]
-        pointsLine = False
-      if reboundsLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['Rebounds'] = match[0]
-        reboundsLine = False
-      if assistsLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['Assists'] = match[0]
-        assistsLine = False
-      if FGPLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['FGP'] = match[0]
-        FGPLine = False
-      if TFGPLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['TFGP'] = match[0]
-        TFGPLine = False
-      if FTPLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['FTP'] = match[0]
-        FTPLine = False
-      if EFGPLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['EFGP'] = match[0]
-        EFGPLine = False
-      if WSLine:
-        match = re.findall('<p>([\d.]*)</p></div>', str(line))
-        if match:  
-          player_data_noyear[player]['WS'] = match[0]
-        WSLine = False
-      
-      
-      matchGames = re.findall('data-tip="Games"><strong>G</strong>', str(line))
-      matchPoints = re.findall('data-tip="Points"><strong>PTS</strong>', str(line))
-      matchRebounds = re.findall('data-tip="Total Rebounds"><strong>TRB</strong>', str(line))
-      matchAssists = re.findall('data-tip="Assists"><strong>AST</strong>', str(line))
-      matchFGP = re.findall('data-tip="Field Goal Percentage"><strong>FG%</strong>', str(line))
-      matchTFGP = re.findall('data-tip="3-Point Field Goal Percentage"><strong>FG3%</strong>', str(line))
-      matchFTP = re.findall('data-tip="Free Throw Percentage"><strong>FT%</strong>', str(line))
-      matchEFGP = re.findall('data-tip="Effective Field Goal Percentage; this statistic adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal."><strong>eFG%</strong>', str(line))
-      matchWS = re.findall('data-tip="Win Shares; an estimate of the number of wins contributed by a player due to his offense and defense."><strong>WS</strong>', str(line))
-      
-      if matchGames:
-        gamesLine = True
-      if matchPoints:
-        pointsLine = True
-      if matchRebounds:
-        reboundsLine = True
-      if matchAssists:
-        assistsLine = True
-      if matchFGP:
-        FGPLine = True
-      if matchTFGP:
-        TFGPLine = True
-      if matchFTP:
-        FTPLine = True
-      if matchEFGP:
-        EFGPLine = True
-      if matchWS:
-        WSLine = True
+
+    player_data_noyear[player] = fetch_college_player_data(players_cbb[player])
 
   print('successfully retrieved all college data')
   return player_data_noyear
@@ -298,7 +303,6 @@ def init_data_gist():
     json.dump(cbb_json, outfile)
 
 
-# TODO: optimize or remove
 def find_similar_player(player, player_list):
   most_similar = ''
   high_similarity = 0
@@ -324,10 +328,27 @@ def main():
   players_df = pd.read_csv(os.path.join(os.getcwd(), 'data', 'player_data.csv'))
   cbb_players = json.load(open(os.path.join(os.getcwd(), 'data', 'college_players.json'), 'r'))
 
+  players_valid = []
   for player in players:
-    if player not in cbb_players.keys():
+    if player in cbb_players.keys():
+      players_valid.append(player)
+    else:
       potential_player = find_similar_player(player, list(cbb_players.keys()))
-      print(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '?')
+      r = input(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '? [y/n]\n')
+      if r == 'y':
+        players_valid.append(potential_player)
+  
+  print('fetching data on input players...')
+  input_player_data = []
+  for player in players_valid:
+    input_player_data.append({
+      'name': player,
+      **fetch_college_player_data(cbb_players[player])
+    })
+
+  input_player_df = pd.DataFrame(input_player_data)
+
+  print(input_player_df)
 
 
 if __name__ == '__main__':
