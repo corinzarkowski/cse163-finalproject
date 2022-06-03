@@ -7,6 +7,7 @@ import argparse
 import string
 import json
 import ssl
+from difflib import SequenceMatcher
 
 URL_CSV = 'https://gist.githubusercontent.com/corinzarkowski/4d1e66a9253b552ee95d62dbf74b3185/raw/579c5421fae54680435ca33e104c254c74638af1/cbb_nba_data.csv'
 URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c4095e55173d52873b/raw/8541672e08f7f1f00dd8ef4440b7742f87357c33/cbb_names_urls.json'
@@ -298,6 +299,20 @@ def init_data_gist():
     json.dump(cbb_json, outfile)
 
 
+# TODO: optimize or remove
+def find_similar_player(player, player_list):
+  most_similar = ''
+  high_similarity = 0
+  for other in player_list:
+    if player[0].lower() == other[0].lower():
+      similarity = SequenceMatcher(None, player, other).ratio()
+      if similarity > high_similarity:
+        most_similar = other
+        high_similarity = similarity
+
+  return most_similar
+
+
 def main():
   refresh_manual, refresh_gist, players = process_args()
 
@@ -306,6 +321,14 @@ def main():
 
   if refresh_gist or not data_loaded():
     init_data_gist()
+
+  players_df = pd.read_csv(os.path.join(os.getcwd(), 'data', 'player_data.csv'))
+  cbb_players = json.load(open(os.path.join(os.getcwd(), 'data', 'college_players.json'), 'r'))
+
+  for player in players:
+    if player not in cbb_players.keys():
+      potential_player = find_similar_player(player, list(cbb_players.keys()))
+      print(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '?')
   
 
 
