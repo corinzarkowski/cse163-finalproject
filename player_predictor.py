@@ -89,25 +89,25 @@ def fetch_nba_career_data(players):
         
         player_data_by_year[match[0]][year] = {}
 
-        matchPoints = re.findall('data-stat="pts" >([\d]*)</td>', str(line))
-        if matchPoints:
-          player_data_by_year[match[0]][year]['points'] = matchPoints[0]
+        match_points = re.findall('data-stat="pts" >([\d]*)</td>', str(line))
+        if match_points:
+          player_data_by_year[match[0]][year]['points'] = match_points[0]
 
-        matchRebounds = re.findall('data-stat="trb" >([\d]*)</td>', str(line))
-        if matchRebounds:
-          player_data_by_year[match[0]][year]['rebounds'] = matchRebounds[0]
+        match_rebounds = re.findall('data-stat="trb" >([\d]*)</td>', str(line))
+        if match_rebounds:
+          player_data_by_year[match[0]][year]['rebounds'] = match_rebounds[0]
 
-        matchSteals = re.findall('data-stat="stl" >([\d]*)</td>', str(line))
-        if matchSteals:
-          player_data_by_year[match[0]][year]['steals'] = matchSteals[0]
+        match_steals = re.findall('data-stat="stl" >([\d]*)</td>', str(line))
+        if match_steals:
+          player_data_by_year[match[0]][year]['steals'] = match_steals[0]
 
-        matchAssists = re.findall('data-stat="ast" >([\d]*)</td>', str(line))
-        if matchAssists:
-          player_data_by_year[match[0]][year]['assists'] = matchAssists[0]
+        match_assists = re.findall('data-stat="ast" >([\d]*)</td>', str(line))
+        if match_assists:
+          player_data_by_year[match[0]][year]['assists'] = match_assists[0]
 
-        matchBlocks = re.findall('data-stat="blk" >([\d]*)</td>', str(line))
-        if matchBlocks:
-          player_data_by_year[match[0]][year]['blocks'] = matchBlocks[0]
+        match_blocks = re.findall('data-stat="blk" >([\d]*)</td>', str(line))
+        if match_blocks:
+          player_data_by_year[match[0]][year]['blocks'] = match_blocks[0]
   
   return player_data_by_year
 
@@ -150,92 +150,92 @@ def fetch_college_player_data(player_url):
   data = requests.get(URL, stream=True)
   cur_player = {}
   
-  gamesLine = False
-  pointsLine = False
-  reboundsLine = False
-  assistsLine = False
-  FGPLine = False
-  TFGPLine = False
-  FTPLine = False
-  EFGPLine = False
-  WSLine = False
+  games_line = False
+  points_line = False
+  rebounds_line = False
+  assists_line = False
+  fgp_line = False
+  tfgp_line = False
+  ftp_line = False
+  efgp_line = False
+  ws_line = False
   
   for line in data.iter_lines():
-    if gamesLine:
+    if games_line:
       match = re.findall('<p>([\d]*)</p></div>', str(line))
       if match:  
         cur_player['Games'] = match[0]
-      gamesLine = False
-    if pointsLine:
+      games_line = False
+    if points_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['Points'] = match[0]
-      pointsLine = False
-    if reboundsLine:
+      points_line = False
+    if rebounds_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['Rebounds'] = match[0]
-      reboundsLine = False
-    if assistsLine:
+      rebounds_line = False
+    if assists_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['Assists'] = match[0]
-      assistsLine = False
-    if FGPLine:
+      assists_line = False
+    if fgp_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['FGP'] = match[0]
-      FGPLine = False
-    if TFGPLine:
+      fgp_line = False
+    if tfgp_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['TFGP'] = match[0]
-      TFGPLine = False
-    if FTPLine:
+      tfgp_line = False
+    if ftp_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['FTP'] = match[0]
-      FTPLine = False
-    if EFGPLine:
+      ftp_line = False
+    if efgp_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['EFGP'] = match[0]
-      EFGPLine = False
-    if WSLine:
+      efgp_line = False
+    if ws_line:
       match = re.findall('<p>([\d.]*)</p></div>', str(line))
       if match:  
         cur_player['WS'] = match[0]
-      WSLine = False
+      ws_line = False
     
     
-    matchGames = re.findall('data-tip="Games"><strong>G</strong>', str(line))
-    matchPoints = re.findall('data-tip="Points"><strong>PTS</strong>', str(line))
-    matchRebounds = re.findall('data-tip="Total Rebounds"><strong>TRB</strong>', str(line))
-    matchAssists = re.findall('data-tip="Assists"><strong>AST</strong>', str(line))
-    matchFGP = re.findall('data-tip="Field Goal Percentage"><strong>FG%</strong>', str(line))
-    matchTFGP = re.findall('data-tip="3-Point Field Goal Percentage"><strong>FG3%</strong>', str(line))
-    matchFTP = re.findall('data-tip="Free Throw Percentage"><strong>FT%</strong>', str(line))
-    matchEFGP = re.findall('data-tip="Effective Field Goal Percentage; this statistic adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal."><strong>eFG%</strong>', str(line))
-    matchWS = re.findall('data-tip="Win Shares; an estimate of the number of wins contributed by a player due to his offense and defense."><strong>WS</strong>', str(line))
+    match_games = re.findall('data-tip="Games"><strong>G</strong>', str(line))
+    match_points = re.findall('data-tip="Points"><strong>PTS</strong>', str(line))
+    match_rebounds = re.findall('data-tip="Total Rebounds"><strong>TRB</strong>', str(line))
+    match_assists = re.findall('data-tip="Assists"><strong>AST</strong>', str(line))
+    match_fgp = re.findall('data-tip="Field Goal Percentage"><strong>FG%</strong>', str(line))
+    match_tfgp = re.findall('data-tip="3-Point Field Goal Percentage"><strong>FG3%</strong>', str(line))
+    match_ftp = re.findall('data-tip="Free Throw Percentage"><strong>FT%</strong>', str(line))
+    match_efgp = re.findall('data-tip="Effective Field Goal Percentage; this statistic adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal."><strong>eFG%</strong>', str(line))
+    match_ws = re.findall('data-tip="Win Shares; an estimate of the number of wins contributed by a player due to his offense and defense."><strong>WS</strong>', str(line))
     
-    if matchGames:
-        gamesLine = True
-    if matchPoints:
-        pointsLine = True
-    if matchRebounds:
-        reboundsLine = True
-    if matchAssists:
-        assistsLine = True
-    if matchFGP:
-        FGPLine = True
-    if matchTFGP:
-        TFGPLine = True
-    if matchFTP:
-        FTPLine = True
-    if matchEFGP:
-        EFGPLine = True
-    if matchWS:
-        WSLine = True
+    if match_games:
+        games_line = True
+    if match_points:
+        points_line = True
+    if match_rebounds:
+        rebounds_line = True
+    if match_assists:
+        assists_line = True
+    if match_fgp:
+        fgp_line = True
+    if match_tfgp:
+        tfgp_line = True
+    if match_ftp:
+        ftp_line = True
+    if match_efgp:
+        efgp_line = True
+    if match_ws:
+        ws_line = True
 
   return cur_player
 
@@ -331,7 +331,7 @@ def main():
       players_valid.append(player)
     else:
       potential_player = find_similar_player(player, list(cbb_players.keys()))
-      r = input(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '? [y/n]\n')
+      r = input(player + ' is not recognized as a valid college player. Did you mean ' + potential_player + '? [y/n]\n>')
       if r == 'y':
         players_valid.append(potential_player)
   
