@@ -8,6 +8,9 @@ import json
 import ssl
 from difflib import SequenceMatcher
 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+
 URL_CSV = 'https://gist.githubusercontent.com/corinzarkowski/4d1e66a9253b552ee95d62dbf74b3185/raw/579c5421fae54680435ca33e104c254c74638af1/cbb_nba_data.csv'
 URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c4095e55173d52873b/raw/8541672e08f7f1f00dd8ef4440b7742f87357c33/cbb_names_urls.json'
 
@@ -313,6 +316,31 @@ def find_similar_player(player, player_list):
   return most_similar
 
 
+def train_model_careerstats(data):
+  data = data[['Points', 'Assists', 'Rebounds', 'FGP', 'best_year', 'nba_career_length']]
+  data = data.dropna()
+
+  features = data[['Points', 'Assists', 'Rebounds', 'FGP']].astype(float)
+  labels = data[['best_year', 'nba_career_length']].astype(float)
+
+  clf = RandomForestClassifier(max_depth=10, random_state=0)
+  clf.fit(features, labels)
+
+  return clf
+
+def train_model_allstar(data):
+  data = data[['Points', 'Assists', 'Rebounds', 'allstar']]
+  data = data.dropna()
+
+  features = data[['Points', 'Assists', 'Rebounds']].astype(float)
+  label = data['allstar'].astype(bool)
+
+  clf = DecisionTreeClassifier(max_depth=10, random_state=0)
+  clf.fit(features, label)
+
+  return clf
+
+
 def main():
   refresh_manual, refresh_gist, players = process_args()
 
@@ -343,9 +371,16 @@ def main():
       **fetch_college_player_data(cbb_players[player])
     })
 
-  input_player_df = pd.DataFrame(input_player_data)
+  classifier_career = train_model_careerstats(players_df)
+  classifier_allstar = train_model_allstar(players_df)
 
-  print(input_player_df)
+  for input_player in input_player_data:
+    input_player_careerstats = classifier_career.predict([[input_player['Points'], input_player['Assists'], input_player['Rebounds'], input_player['FGP']]])
+    input_player_allstar = classifier_allstar.predict([[input_player['Points'], input_player['Assists'], input_player['Rebounds']]])
+    print(input_player)
+    print('projected career length: ' + str(input_player_careerstats[0][1]))
+    print('projected best year: ' + str(input_player_careerstats[0][0]))
+    print('projected all star: ' + str(input_player_allstar[0]))
 
 
 if __name__ == '__main__':
