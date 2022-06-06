@@ -145,7 +145,6 @@ def train_model_careerstats(data, estimators, depth):
 
     reg = RandomForestRegressor(n_estimators=estimators, max_depth=depth)
     reg.fit(features, labels)
-
     return reg
 
 
@@ -160,7 +159,6 @@ def train_model_allstar(data, estimators, depth):
 
     clf = RandomForestClassifier(n_estimators=estimators, max_depth=depth)
     clf.fit(features, label)
-
     return clf
 
 
@@ -262,10 +260,10 @@ def main():
                                                             input_player['Rebounds'],
                                                             input_player['FGP']]])
         print(input_player)
-        print('projected career length: ' + 
+        print('projected career length: ' +
               str(int(input_player_careerstats[0][1])) +
               ' years')
-        print('projected prime: year ' + 
+        print('projected prime: year ' +
               str(int(input_player_careerstats[0][0])))
         print('will become all-star: ' + str(input_player_allstar[0]))
 
