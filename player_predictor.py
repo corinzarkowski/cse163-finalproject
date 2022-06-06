@@ -146,7 +146,6 @@ def train_model_careerstats(data, estimators, depth):
 
     reg = RandomForestRegressor(n_estimators=estimators, max_depth=depth)
     reg.fit(features, labels)
-    print(reg)
     return reg
 
 
@@ -161,7 +160,6 @@ def train_model_allstar(data, estimators, depth):
 
     clf = RandomForestClassifier(n_estimators=estimators, max_depth=depth)
     clf.fit(features, label)
-    print(clf)
     return clf
 
 
