@@ -46,7 +46,6 @@ def process_args():
                         const=True, default=False,
                         help='Option to refresh player data \
                              from pre-existing gist pages (default)')
-
     parser.add_argument('--test-models', dest='is_test',
                         action='store_const',
                         const=True, default=False,
