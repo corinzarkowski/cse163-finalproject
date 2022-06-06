@@ -1,6 +1,6 @@
 """
 Corey Zarkowski, Bryan Phan, Lawrence Lorbiecki -- CSE 163
-TEMPLATE COMMENT
+This file does player
 """
 
 import os
@@ -11,7 +11,6 @@ import json
 import ssl
 from difflib import SequenceMatcher
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 from manual_utils import fetch_cbb_player_URLs, fetch_college_data,\
                          fetch_college_player_data,\
