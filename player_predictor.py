@@ -1,3 +1,8 @@
+"""
+Corey Zarkowski, Bryan Phan, Lawrence Lorbiecki -- CSE 163
+TEMPLATE COMMENT
+"""
+
 import os
 import requests
 import pandas as pd
@@ -5,8 +10,9 @@ import argparse
 import json
 import ssl
 from difflib import SequenceMatcher
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, mean_squared_error
 from manual_utils import fetch_cbb_player_URLs, fetch_college_data,\
                          fetch_college_player_data,\
                          fetch_nba_player_URLs, format_career_data,\
@@ -17,6 +23,9 @@ URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c409
 
 
 def process_args():
+    """
+    TEMPLATE COMMENT
+    """
     parser = argparse.ArgumentParser(description='Take college basketball \
                                                  players and return career \
                                                  predictions')
@@ -38,12 +47,22 @@ def process_args():
                         help='Option to refresh player data \
                              from pre-existing gist pages (default)')
 
+    parser.add_argument('--test-models', dest='is_test',
+                        action='store_const',
+                        const=True, default=False,
+                        help='Option to test models with depth \
+                             and tree counts for random forest')
+
     args = parser.parse_args()
 
-    return args.do_refresh_man, args.do_refresh_gist, args.players
+    return args.do_refresh_man, args.do_refresh_gist, \
+           args.players, args.is_test
 
 
 def data_loaded():
+    """
+    TEMPLATE COMMENT
+    """
     return os.path.exists(os.path.join(os.getcwd(),
                           'data', 'player_data.csv'))\
            and os.path.exists(os.path.join(os.getcwd(), 'data',
@@ -51,6 +70,9 @@ def data_loaded():
 
 
 def init_data_manual():
+    """
+    TEMPLATE COMMENT
+    """
     print('initializing data...')
     if not os.path.exists(os.path.join(os.getcwd(), 'data')):
         os.mkdir(os.path.join(os.getcwd(), 'data'))
@@ -77,6 +99,9 @@ def init_data_manual():
 
 
 def init_data_gist():
+    """
+    TEMPLATE COMMENT
+    """
     print('initializing data...')
 
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -94,6 +119,9 @@ def init_data_gist():
 
 
 def find_similar_player(player, player_list):
+    """
+    TEMPLATE COMMENT
+    """
     most_similar = ''
     high_similarity = 0
     for other in player_list:
@@ -106,35 +134,86 @@ def find_similar_player(player, player_list):
     return most_similar
 
 
-def train_model_careerstats(data):
+def train_model_careerstats(data, estimators, depth):
+    """
+    TEMPLATE COMMENT
+    """
     data = data[['Points', 'Assists', 'Rebounds', 'FGP',
-                 'best_year', 'nba_career_length']]
-    data = data.dropna()
+                 'best_year', 'nba_career_length']].dropna()
 
     features = data[['Points', 'Assists', 'Rebounds', 'FGP']].astype(float)
     labels = data[['best_year', 'nba_career_length']].astype(float)
 
-    clf = RandomForestClassifier(max_depth=10, random_state=0)
-    clf.fit(features, labels)
+    reg = RandomForestRegressor(n_estimators=estimators, max_depth=depth)
+    reg.fit(features, labels)
 
-    return clf
+    return reg
 
 
-def train_model_allstar(data):
-    data = data[['Points', 'Assists', 'Rebounds', 'allstar']]
-    data = data.dropna()
+def train_model_allstar(data, estimators, depth):
+    """
+    TEMPLATE COMMENT
+    """
+    data = data[['Points', 'Assists', 'Rebounds', 'FGP', 'allstar']].dropna()
 
-    features = data[['Points', 'Assists', 'Rebounds']].astype(float)
+    features = data[['Points', 'Assists', 'Rebounds', 'FGP']].astype(float)
     label = data['allstar'].astype(bool)
 
-    clf = DecisionTreeClassifier(max_depth=10, random_state=0)
+    clf = RandomForestClassifier(n_estimators=estimators, max_depth=depth)
     clf.fit(features, label)
 
     return clf
 
 
+def test_models(data):
+    """
+    TEMPLATE COMMENT
+    """
+    print('testing models...')
+    data = data[['Points', 'Assists', 'Rebounds', 'FGP',
+                 'best_year', 'nba_career_length', 'allstar']].dropna()
+
+    train = data.sample(frac = 0.75)
+    test = data.drop(train.index)
+
+    best_reg = None
+    best_clf = None
+    best_mse = 0
+    best_ascore = 0
+
+    for est in range(100, 500, 100):
+        for depth in range(10, 50, 10):
+            reg = train_model_careerstats(train, est, depth)
+            clf = train_model_allstar(train, est, depth)
+            pred_r = reg.predict(test[['Points', 'Assists',
+                                       'Rebounds', 'FGP']])
+            pred_c = clf.predict(test[['Points', 'Assists',
+                                       'Rebounds', 'FGP']])
+
+            cur_mse = mean_squared_error(test[['best_year',
+                                               'nba_career_length']],
+                                         pred_r)
+            cur_ascore = accuracy_score(test[['allstar']], pred_c)
+
+            if cur_mse > best_mse:
+                print('regressor values updated to est:' + str(est) +
+                      ', depth: ' + str(depth))
+                best_reg = reg
+                best_mse = cur_mse
+            if cur_ascore > best_ascore:
+                print('classifier params updated to est:' + str(est) +
+                      ', depth: ' + str(depth))
+                best_clf = clf
+                best_ascore = cur_ascore
+
+    return best_reg, best_clf
+
+
 def main():
-    refresh_manual, refresh_gist, players = process_args()
+    """
+    TEMPLATE COMMENT
+    """
+    refresh_manual, refresh_gist, players, is_test = process_args()
 
     if refresh_manual:
         init_data_manual()
@@ -168,8 +247,11 @@ def main():
             **fetch_college_player_data(cbb_players[player])
         })
 
-    classifier_career = train_model_careerstats(players_df)
-    classifier_allstar = train_model_allstar(players_df)
+    if not is_test:
+        classifier_career = train_model_careerstats(players_df, 100, None)
+        classifier_allstar = train_model_allstar(players_df, 100, None)
+    else:
+        classifier_career, classifier_allstar = test_models(players_df)
 
     for input_player in input_player_data:
         input_player_careerstats = classifier_career.predict([[input_player['Points'],
@@ -178,11 +260,15 @@ def main():
                                                                input_player['FGP']]])
         input_player_allstar = classifier_allstar.predict([[input_player['Points'],
                                                             input_player['Assists'],
-                                                            input_player['Rebounds']]])
+                                                            input_player['Rebounds'],
+                                                            input_player['FGP']]])
         print(input_player)
-        print('projected career length: ' + str(input_player_careerstats[0][1]))
-        print('projected best year: ' + str(input_player_careerstats[0][0]))
-        print('projected all star: ' + str(input_player_allstar[0]))
+        print('projected career length: ' + 
+              str(int(input_player_careerstats[0][1])) +
+              ' years')
+        print('projected prime: year ' + 
+              str(int(input_player_careerstats[0][0])))
+        print('will become all-star: ' + str(input_player_allstar[0]))
 
 
 if __name__ == '__main__':

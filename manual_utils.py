@@ -1,8 +1,16 @@
+"""
+Corey Zarkowski, Bryan Phan, Lawrence Lorbiecki -- CSE 163
+TEMPLATE COMMENT
+"""
+
 import requests
 import re
 import string
 
 def fetch_nba_player_URLs():
+    """
+    TEMPLATE COMMENT
+    """
     print('fetching nba player urls...')
 
     letters = list(string.ascii_lowercase)
@@ -23,6 +31,9 @@ def fetch_nba_player_URLs():
 
 
 def fetch_cbb_player_URLs():
+    """
+    TEMPLATE COMMENT
+    """
     print('fetching cbb player urls...')
 
     letters = list(string.ascii_lowercase)
@@ -42,6 +53,9 @@ def fetch_cbb_player_URLs():
 
 
 def fetch_nba_career_data(players):
+    """
+    TEMPLATE COMMENT
+    """
     print('retrieving nba career data...')
     player_data_by_year = {}
 
@@ -92,6 +106,9 @@ def fetch_nba_career_data(players):
 
 
 def format_career_data(player_data_by_year):
+    """
+    TEMPLATE COMMENT
+    """
     print('formatting career data...')
 
     player_data_noyear = {}
@@ -126,6 +143,9 @@ def format_career_data(player_data_by_year):
 
 
 def fetch_college_player_data(player_url):
+    """
+    TEMPLATE COMMENT
+    """
     URL = 'https://www.sports-reference.com/cbb/players' + player_url
     data = requests.get(URL, stream=True)
     cur_player = {}
@@ -230,6 +250,9 @@ def fetch_college_player_data(player_url):
 
 
 def fetch_college_data(players_cbb, player_data_noyear):
+    """
+    TEMPLATE COMMENT
+    """
     print('fetching college data for nba players...')
     print('this may take a while')
  
