@@ -57,7 +57,7 @@ def process_args():
     args = parser.parse_args()
 
     return args.do_refresh_man, args.do_refresh_gist, \
-           args.players, args.is_test
+        args.players, args.is_test
 
 
 def data_loaded():
@@ -67,8 +67,8 @@ def data_loaded():
     """
     return os.path.exists(os.path.join(os.getcwd(),
                           'data', 'player_data.csv'))\
-           and os.path.exists(os.path.join(os.getcwd(), 'data',
-                                           'college_players.json'))
+        and os.path.exists(os.path.join(os.getcwd(), 'data',
+                                        'college_players.json'))
 
 
 def init_data_manual():
@@ -187,7 +187,7 @@ def test_models(data):
     data = data[['Points', 'Assists', 'Rebounds', 'FGP',
                  'best_year', 'nba_career_length', 'allstar']].dropna()
 
-    train = data.sample(frac = 0.75)
+    train = data.sample(frac=0.75)
     test = data.drop(train.index)
 
     best_reg = None
