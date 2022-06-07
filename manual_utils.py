@@ -1,6 +1,7 @@
 """
 Corey Zarkowski, Bryan Phan, Lawrence Lorbiecki -- CSE 163
-TEMPLATE COMMENT
+Utility functions for web scraping, used in 'player_predictor.py' for
+manually refreshing datasets.
 """
 
 import requests
@@ -9,7 +10,9 @@ import string
 
 def fetch_nba_player_URLs():
     """
-    TEMPLATE COMMENT
+    Scrapes nba player names and URLs by going through the basketball-
+    reference alphabetical player index. Returns a dict of player names to
+    URLs as key-value pairs.
     """
     print('fetching nba player urls...')
 
@@ -32,7 +35,9 @@ def fetch_nba_player_URLs():
 
 def fetch_cbb_player_URLs():
     """
-    TEMPLATE COMMENT
+    Scrapes college player names and URLs by going through the sports-
+    reference alphabetical player index. Returns a dict of player names to
+    URLs as key-value pairs.
     """
     print('fetching cbb player urls...')
 
@@ -54,7 +59,9 @@ def fetch_cbb_player_URLs():
 
 def fetch_nba_career_data(players):
     """
-    TEMPLATE COMMENT
+    Scrapes NBA career data by going through total player stats for each
+    season, and appending seasonal totals to the previously created player
+    dict. Returns the updated player dict.
     """
     print('retrieving nba career data...')
     player_data_by_year = {}
@@ -107,7 +114,9 @@ def fetch_nba_career_data(players):
 
 def format_career_data(player_data_by_year):
     """
-    TEMPLATE COMMENT
+    Takes the previously created player data dict, and uses it to calculate
+    career length & best year. Returns an updated dict with those fields
+    included.
     """
     print('formatting career data...')
 
@@ -144,7 +153,8 @@ def format_career_data(player_data_by_year):
 
 def fetch_college_player_data(player_url):
     """
-    TEMPLATE COMMENT
+    Takes a url for a college basketball player and returns a dict with
+    their total career stats.
     """
     URL = 'https://www.sports-reference.com/cbb/players' + player_url
     data = requests.get(URL, stream=True)
@@ -251,7 +261,8 @@ def fetch_college_player_data(player_url):
 
 def fetch_college_data(players_cbb, player_data_noyear):
     """
-    TEMPLATE COMMENT
+    Takes dicts of college players/urls & nba players. Scrapes college data for
+    every nba player given and adds it to the nba player dict.
     """
     print('fetching college data for nba players...')
     print('this may take a while')

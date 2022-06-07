@@ -1,6 +1,8 @@
 """
 Corey Zarkowski, Bryan Phan, Lawrence Lorbiecki -- CSE 163
-This file does player
+This file contains primary methods for predicting a college basketball
+player's future NBA career based off their college stats. More detail can
+be found in function headers.
 """
 
 import os
@@ -23,7 +25,8 @@ URL_JSON = 'https://gist.githubusercontent.com/corinzarkowski/f6bee01b354419c409
 
 def process_args():
     """
-    TEMPLATE COMMENT
+    This file parses command line arguments and returns them formatted nicely.
+    Documentation for the arguments can be seen with the '-h' argument.
     """
     parser = argparse.ArgumentParser(description='Take college basketball \
                                                  players and return career \
@@ -59,7 +62,8 @@ def process_args():
 
 def data_loaded():
     """
-    TEMPLATE COMMENT
+    Checks to see if the nba datafile & college datafile are loaded. If
+    anything is unloaded, returns False, else True.
     """
     return os.path.exists(os.path.join(os.getcwd(),
                           'data', 'player_data.csv'))\
@@ -69,7 +73,9 @@ def data_loaded():
 
 def init_data_manual():
     """
-    TEMPLATE COMMENT
+    Scrapes data on nba/college basketball players, formats it,
+    and then writes it to 'player_data.csv' and 'college_players.json'.
+    Uses functions from 'manual_utils.py'
     """
     print('initializing data...')
     if not os.path.exists(os.path.join(os.getcwd(), 'data')):
@@ -98,7 +104,10 @@ def init_data_manual():
 
 def init_data_gist():
     """
-    TEMPLATE COMMENT
+    Reads in nba/college datasets from gist--much much faster than manually
+    scraping, since it only takes 2 queries instead of ~2000. Also writes
+    the data to the same files. This is the intended way to use the
+    predictor.
     """
     print('initializing data...')
 
@@ -118,7 +127,9 @@ def init_data_gist():
 
 def find_similar_player(player, player_list):
     """
-    TEMPLATE COMMENT
+    Takes a player string and a list of players, and returns the most similar
+    player from the player list. Very useful, since inputs must be case
+    sensitive & exact.
     """
     most_similar = ''
     high_similarity = 0
@@ -134,7 +145,9 @@ def find_similar_player(player, player_list):
 
 def train_model_careerstats(data, estimators, depth):
     """
-    TEMPLATE COMMENT
+    Takes a dataset (pandas df), an estimator count (int), and a depth (int).
+    Trains & returns a RandomForestRegressor model for player prime
+    and nba career length based on college stats, with the specified params.
     """
     data = data[['Points', 'Assists', 'Rebounds', 'FGP',
                  'best_year', 'nba_career_length']].dropna()
@@ -149,7 +162,9 @@ def train_model_careerstats(data, estimators, depth):
 
 def train_model_allstar(data, estimators, depth):
     """
-    TEMPLATE COMMENT
+    Takes a dataset (pandas df), an estimator count (int), and a depth (int).
+    Trains & returns a RandomForestRegressor model for player prime
+    and nba career length based on college stats, with the specified params.
     """
     data = data[['Points', 'Assists', 'Rebounds', 'FGP', 'allstar']].dropna()
 
@@ -163,7 +178,10 @@ def train_model_allstar(data, estimators, depth):
 
 def test_models(data):
     """
-    TEMPLATE COMMENT
+    Takes a dataset (pandas df) of nba player data with college stats, and
+    trains a bunch of models with different params, while keeping track
+    of accuracy scores/mean squared error, and returning the params that
+    produce the best results.
     """
     print('testing models...')
     data = data[['Points', 'Assists', 'Rebounds', 'FGP',
@@ -207,7 +225,11 @@ def test_models(data):
 
 def main():
     """
-    TEMPLATE COMMENT
+    Trains a model and returns career predictions on inputted players. Will
+    prompt the user if any input names aren't found 1:1 in the player list,
+    and offer the closest suggestion. Checks if the script is running in
+    manual refresh vs gist refresh mode, as well as if it should test the
+    model params or just use the defaults.
     """
     refresh_manual, refresh_gist, players, is_test = process_args()
 
